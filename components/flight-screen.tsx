@@ -63,7 +63,7 @@ export function FlightScreen({ ticket }: { ticket: Ticket }) {
 
   return (
     <>
-      <div className="flex items-start justify-between gap-4">
+      <div className="takeoff-reveal flex items-start justify-between gap-4">
         <div className="flex flex-col gap-1">
           <h1 className="font-mono text-2xl font-semibold tracking-wider">{route}</h1>
           <p className="text-sm text-muted-foreground">
@@ -79,7 +79,7 @@ export function FlightScreen({ ticket }: { ticket: Ticket }) {
         <FlightMap origin={ticket.origin} destination={ticket.destination} progress={progress} />
       </div>
 
-      <div className="flex flex-col gap-4">
+      <div className="takeoff-reveal flex flex-col gap-4 [--reveal-delay:1400ms]">
         <div
           className={`text-center font-mono text-6xl font-semibold tabular-nums tracking-tight transition-opacity ${paused ? "opacity-50" : ""}`}
           role="timer"
@@ -96,7 +96,7 @@ export function FlightScreen({ ticket }: { ticket: Ticket }) {
       </div>
 
       {!landed && (
-        <div className="flex flex-col gap-2">
+        <div className="takeoff-reveal flex flex-col gap-2 [--reveal-delay:1600ms]">
           <Button
             size="lg"
             variant={paused ? "default" : "outline"}

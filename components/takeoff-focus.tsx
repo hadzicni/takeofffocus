@@ -7,7 +7,6 @@ import { FlightScreen } from "@/components/flight-screen"
 import { LandingDialog } from "@/components/landing-dialog"
 import { StartScreen } from "@/components/start-screen"
 import { useFlightStore } from "@/lib/flight-store"
-import { requestNotificationPermission } from "@/lib/notifications"
 
 export function TakeoffFocus() {
   const { phase, ticket, board, cancelBoarding, newFlight } = useFlightStore()
@@ -21,14 +20,7 @@ export function TakeoffFocus() {
 
       {phase === "setup" && <StartScreen />}
       {phase === "boarding" && ticket && (
-        <BoardingScreen
-          ticket={ticket}
-          onBoard={() => {
-            requestNotificationPermission()
-            board()
-          }}
-          onBack={cancelBoarding}
-        />
+        <BoardingScreen ticket={ticket} onBoard={board} onBack={cancelBoarding} />
       )}
       {(phase === "flight" || phase === "landed") && ticket && (
         <>

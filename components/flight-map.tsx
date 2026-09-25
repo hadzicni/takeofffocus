@@ -2,10 +2,19 @@
 
 import "leaflet/dist/leaflet.css"
 
-import { useMemo } from "react"
-import { divIcon, latLngBounds, type LatLngTuple } from "leaflet"
-import { CircleMarker, MapContainer, Marker, Polyline, TileLayer, Tooltip } from "react-leaflet"
+import { useEffect, useMemo } from "react"
+import { divIcon, latLngBounds, type LatLngBounds, type LatLngTuple, type PointTuple } from "leaflet"
+import {
+  CircleMarker,
+  MapContainer,
+  Marker,
+  Polyline,
+  TileLayer,
+  Tooltip,
+  useMap,
+} from "react-leaflet"
 
+import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion"
 import type { Airport } from "@/lib/airports"
 import { interpolate, mapBearing, unwrapLongitude, type Coordinates } from "@/lib/geo"
 
@@ -17,6 +26,13 @@ type FlightMapProps = {
 }
 
 const toLatLng = ({ lat, lon }: Coordinates): LatLngTuple => [lat, lon]
+
+const ROUTE_PADDING: PointTuple = [48, 48]
+
+/** Takeoff camera: starts close on the origin, then flies out to the whole route. */
+const TAKEOFF_ZOOM = 9
+const TAKEOFF_CAMERA_S = 2.2
+const TAKEOFF_CAMERA_DELAY_MS = 150
 
 // Airplane silhouette pointing north (Material Symbols "flight", Apache 2.0).
 const PLANE_PATH =
@@ -33,17 +49,21 @@ export default function FlightMap({ origin, destination, progress }: FlightMapPr
         className: "flight-plane",
         iconSize: [28, 28],
         iconAnchor: [14, 14],
-        html: `<svg viewBox="0 0 24 24" style="transform: rotate(${mapBearing(origin, end)}deg)"><path d="${PLANE_PATH}"/></svg>`,
+        // The body wrapper carries the liftoff animation; Leaflet owns the outer element's transform.
+        html: `<div class="flight-plane-body"><svg viewBox="0 0 24 24" style="transform: rotate(${mapBearing(origin, end)}deg)"><path d="${PLANE_PATH}"/></svg></div>`,
       }),
     [origin, end]
   )
 
   const position = interpolate(origin, end, progress)
+  const reducedMotion = usePrefersReducedMotion()
+  const initialView = reducedMotion
+    ? { bounds, boundsOptions: { padding: ROUTE_PADDING } }
+    : { center: toLatLng(origin), zoom: TAKEOFF_ZOOM }
 
   return (
     <MapContainer
-      bounds={bounds}
-      boundsOptions={{ padding: [48, 48] }}
+      {...initialView}
       zoomControl={false}
       scrollWheelZoom={false}
       className="size-full"
@@ -78,6 +98,21 @@ export default function FlightMap({ origin, destination, progress }: FlightMapPr
       ))}
 
       <Marker position={toLatLng(position)} icon={planeIcon} interactive={false} />
+      {!reducedMotion && <TakeoffCamera bounds={bounds} />}
     </MapContainer>
   )
+}
+
+function TakeoffCamera({ bounds }: { bounds: LatLngBounds }) {
+  const map = useMap()
+
+  useEffect(() => {
+    const id = setTimeout(
+      () => map.flyToBounds(bounds, { padding: ROUTE_PADDING, duration: TAKEOFF_CAMERA_S }),
+      TAKEOFF_CAMERA_DELAY_MS
+    )
+    return () => clearTimeout(id)
+  }, [map, bounds])
+
+  return null
 }
