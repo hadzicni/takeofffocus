@@ -17,6 +17,23 @@ export type RouteOption = {
   withinTolerance: boolean
 }
 
+/** The route between two chosen airports, rated against the focus duration. */
+export function routeBetween(
+  origin: Airport,
+  destination: Airport,
+  focusMinutes: number,
+  tolerance = DURATION_TOLERANCE
+): RouteOption {
+  const targetKm = distanceForMinutes(focusMinutes)
+  const distanceKm = haversineDistanceKm(origin, destination)
+  return {
+    destination,
+    distanceKm,
+    flightMinutes: flightMinutes(distanceKm),
+    withinTolerance: Math.abs(distanceKm - targetKm) <= targetKm * tolerance,
+  }
+}
+
 /**
  * Destinations whose distance best matches the focus duration, best first.
  * Falls back to the closest matches when no airport lies within tolerance.
@@ -29,15 +46,7 @@ export function findRouteOptions(
   const targetKm = distanceForMinutes(focusMinutes)
 
   const options = airports
-    .map((destination) => {
-      const distanceKm = haversineDistanceKm(origin, destination)
-      return {
-        destination,
-        distanceKm,
-        flightMinutes: flightMinutes(distanceKm),
-        withinTolerance: Math.abs(distanceKm - targetKm) <= targetKm * tolerance,
-      }
-    })
+    .map((destination) => routeBetween(origin, destination, focusMinutes, tolerance))
     .filter((option) => option.distanceKm >= MIN_ROUTE_KM)
     .sort((a, b) => Math.abs(a.distanceKm - targetKm) - Math.abs(b.distanceKm - targetKm))
 

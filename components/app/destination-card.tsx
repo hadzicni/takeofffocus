@@ -4,19 +4,28 @@ import { FlapText } from "@/components/flap-text"
 import { Button } from "@/components/ui/button"
 import type { Airport } from "@/lib/airports"
 import type { RouteOption } from "@/lib/flight"
-import { formatKm } from "@/lib/format"
+import { formatFlightTime, formatKm } from "@/lib/format"
 
 type DestinationCardProps = {
   origin: Airport | null
   route: RouteOption | null
   focusMinutes: number
+  /** Destination picked by hand rather than matched to the focus time. */
+  manual: boolean
   canShuffle: boolean
   onShuffle: () => void
 }
 
 const card = "rounded-2xl bg-white/[0.04] p-5 ring-1 ring-white/[0.06]"
 
-export function DestinationCard({ origin, route, focusMinutes, canShuffle, onShuffle }: DestinationCardProps) {
+export function DestinationCard({
+  origin,
+  route,
+  focusMinutes,
+  manual,
+  canShuffle,
+  onShuffle,
+}: DestinationCardProps) {
   if (!origin || !route) {
     return (
       <div className={`${card} flex items-center gap-4`}>
@@ -24,15 +33,17 @@ export function DestinationCard({ origin, route, focusMinutes, canShuffle, onShu
           <MapPinIcon className="size-4" />
         </span>
         <p className="text-sm text-muted-foreground">
-          Wähle deinen Abflughafen. Wir suchen ein Ziel, das genau so weit weg ist, wie du fokussieren
-          willst.
+          {manual
+            ? origin
+              ? "Wähle dein Ziel. Die Fokuszeit stellen wir auf die echte Flugzeit ein."
+              : "Wähle Abflug und Ziel, und wir berechnen deine Flugzeit."
+            : "Wähle deinen Abflughafen. Wir suchen ein Ziel, das genau so weit weg ist, wie du fokussieren willst."}
         </p>
       </div>
     )
   }
 
   const { destination } = route
-  const flightMinutes = Math.round(route.flightMinutes)
 
   return (
     <div className={`${card} flex flex-col gap-5`} aria-live="polite">
@@ -58,17 +69,15 @@ export function DestinationCard({ origin, route, focusMinutes, canShuffle, onShu
 
       <dl className="grid grid-cols-3 gap-3 border-t border-white/[0.06] pt-4">
         <Stat label="Distanz" value={formatKm(route.distanceKm)} />
-        <Stat
-          label="Flugzeit"
-          value={flightMinutes >= 60 ? `${Math.floor(flightMinutes / 60)} h ${flightMinutes % 60} min` : `${flightMinutes} min`}
-        />
+        <Stat label="Flugzeit" value={formatFlightTime(route.flightMinutes)} />
         <Stat label="Fokus" value={`${focusMinutes} min`} />
       </dl>
 
       {!route.withinTolerance && (
         <p className="-mt-1 text-xs leading-relaxed text-muted-foreground">
-          Kein Ziel liegt genau {focusMinutes} Minuten entfernt, das ist die nächstbeste Route. Dein
-          Timer läuft trotzdem exakt {focusMinutes} Minuten.
+          {manual
+            ? `Dein Timer läuft ${focusMinutes} Minuten, das Flugzeug passt sein Tempo an und landet genau dann.`
+            : `Kein Ziel liegt genau ${focusMinutes} Minuten entfernt, das ist die nächstbeste Route. Dein Timer läuft trotzdem exakt ${focusMinutes} Minuten.`}
         </p>
       )}
     </div>

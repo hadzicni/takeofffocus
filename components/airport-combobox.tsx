@@ -1,6 +1,6 @@
 "use client"
 
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { LocateFixedIcon, LoaderCircleIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
@@ -17,6 +17,13 @@ import { airports, findNearestAirport, type Airport } from "@/lib/airports"
 type AirportComboboxProps = {
   value: Airport | null
   onValueChange: (airport: Airport | null) => void
+  /** Accessible name, e.g. "Abflughafen". */
+  label: string
+  placeholder?: string
+  /** Left out of the list, e.g. the origin when picking a destination. */
+  exclude?: Airport | null
+  /** Offer "nearest airport" via geolocation. */
+  locate?: boolean
 }
 
 const airportLabel = (airport: Airport) => `${airport.iata} · ${airport.city}`
@@ -29,7 +36,18 @@ function matchesQuery(airport: Airport, query: string) {
   )
 }
 
-export function AirportCombobox({ value, onValueChange }: AirportComboboxProps) {
+export function AirportCombobox({
+  value,
+  onValueChange,
+  label,
+  placeholder = "Flughafen, Stadt oder IATA-Code",
+  exclude,
+  locate: canLocate = false,
+}: AirportComboboxProps) {
+  const items = useMemo(
+    () => (exclude ? airports.filter((airport) => airport.iata !== exclude.iata) : airports),
+    [exclude]
+  )
   const [locating, setLocating] = useState(false)
   const [locateError, setLocateError] = useState<string | null>(null)
 
@@ -58,7 +76,7 @@ export function AirportCombobox({ value, onValueChange }: AirportComboboxProps) 
     <div className="flex flex-col gap-2">
       <div className="flex gap-2">
         <Combobox
-          items={airports}
+          items={items}
           value={value}
           onValueChange={onValueChange}
           itemToStringLabel={airportLabel}
@@ -67,8 +85,8 @@ export function AirportCombobox({ value, onValueChange }: AirportComboboxProps) 
           filter={matchesQuery}
         >
           <ComboboxInput
-            placeholder="Flughafen, Stadt oder IATA-Code"
-            aria-label="Abflughafen"
+            placeholder={placeholder}
+            aria-label={label}
             className="h-12 flex-1 rounded-xl bg-white/[0.04] text-base md:text-sm"
           />
           <ComboboxContent>
@@ -92,17 +110,19 @@ export function AirportCombobox({ value, onValueChange }: AirportComboboxProps) 
             </ComboboxList>
           </ComboboxContent>
         </Combobox>
-        <Button
-          variant="secondary"
-          size="icon"
-          className="size-12 rounded-xl"
-          onClick={locate}
-          disabled={locating}
-          aria-label="Nächstgelegenen Flughafen verwenden"
-          title="Nächstgelegenen Flughafen verwenden"
-        >
-          {locating ? <LoaderCircleIcon className="animate-spin" /> : <LocateFixedIcon />}
-        </Button>
+        {canLocate && (
+          <Button
+            variant="secondary"
+            size="icon"
+            className="size-12 rounded-xl"
+            onClick={locate}
+            disabled={locating}
+            aria-label="Nächstgelegenen Flughafen verwenden"
+            title="Nächstgelegenen Flughafen verwenden"
+          >
+            {locating ? <LoaderCircleIcon className="animate-spin" /> : <LocateFixedIcon />}
+          </Button>
+        )}
       </div>
       {locateError && <p className="text-xs text-destructive">{locateError}</p>}
     </div>
