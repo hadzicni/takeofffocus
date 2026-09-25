@@ -1,7 +1,6 @@
 "use client"
 
-import { PlaneTakeoffIcon } from "lucide-react"
-
+import { AppHeader } from "@/components/app-header"
 import { BoardingScreen } from "@/components/boarding-screen"
 import { FlightScreen } from "@/components/flight-screen"
 import { LandingDialog } from "@/components/landing-dialog"
@@ -13,10 +12,7 @@ export function TakeoffFocus() {
 
   return (
     <main className="mx-auto flex w-full max-w-md flex-1 flex-col gap-8 px-4 py-10">
-      <header className="flex items-center gap-2 text-sm font-medium tracking-wide">
-        <PlaneTakeoffIcon className="size-5 text-primary" />
-        TakeoffFocus
-      </header>
+      <AppHeader />
 
       {phase === "setup" && <StartScreen />}
       {phase === "boarding" && ticket && (

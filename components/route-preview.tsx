@@ -3,6 +3,7 @@
 import { PlaneIcon, ShuffleIcon } from "lucide-react"
 
 import { Button } from "@/components/ui/button"
+import { FlapText } from "@/components/flap-text"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import type { Airport } from "@/lib/airports"
 import { formatKm } from "@/lib/format"
@@ -24,10 +25,10 @@ export function RoutePreview({ origin, route, focusMinutes, canShuffle, onShuffl
       <CardContent className="flex flex-col gap-5">
         <div className="flex items-center justify-between gap-4">
           <AirportCode airport={origin} />
-          <div className="flex flex-1 items-center gap-2 text-muted-foreground">
-            <span className="h-px flex-1 border-t border-dashed border-muted-foreground/40" />
+          <div className="flex flex-1 items-center gap-1.5">
+            <span className="h-0.5 flex-1 bg-route" />
             <PlaneIcon className="size-4 rotate-45 text-primary" />
-            <span className="h-px flex-1 border-t border-dashed border-muted-foreground/40" />
+            <span className="h-px flex-1 border-t-2 border-dashed border-route/50" />
           </div>
           <AirportCode airport={destination} align="end" />
         </div>
@@ -60,8 +61,8 @@ export function RoutePreview({ origin, route, focusMinutes, canShuffle, onShuffl
 function AirportCode({ airport, align = "start" }: { airport: Airport; align?: "start" | "end" }) {
   return (
     <div className={align === "end" ? "text-right" : undefined}>
-      <div className="font-mono text-3xl font-semibold tracking-wider">{airport.iata}</div>
-      <div className="text-xs text-muted-foreground">{airport.city}</div>
+      <FlapText text={airport.iata} animate className="text-2xl" />
+      <div className="mt-1.5 text-xs text-muted-foreground">{airport.city}</div>
     </div>
   )
 }
@@ -69,8 +70,10 @@ function AirportCode({ airport, align = "start" }: { airport: Airport; align?: "
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-xs uppercase tracking-wider text-muted-foreground">{label}</dt>
-      <dd className="font-medium tabular-nums">{value}</dd>
+      <dt className="font-mono text-[0.65rem] font-bold tracking-[0.18em] text-muted-foreground uppercase">
+        {label}
+      </dt>
+      <dd className="font-mono font-bold tabular-nums">{value}</dd>
     </div>
   )
 }

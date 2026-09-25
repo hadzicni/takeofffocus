@@ -62,10 +62,10 @@ export function LandingDialog({ ticket, open, onNewFlight }: LandingDialogProps)
 function Stat({ label, value }: { label: string; value: string }) {
   return (
     <div className="flex flex-col gap-0.5">
-      <dt className="text-[0.65rem] font-medium uppercase tracking-widest text-muted-foreground">
+      <dt className="font-mono text-[0.65rem] font-bold tracking-[0.18em] text-muted-foreground uppercase">
         {label}
       </dt>
-      <dd className="font-medium tabular-nums">{value}</dd>
+      <dd className="font-mono font-bold tabular-nums">{value}</dd>
     </div>
   )
 }

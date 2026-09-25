@@ -4,6 +4,7 @@ import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
 import { PauseIcon, PlayIcon, Volume2Icon, VolumeXIcon, XIcon } from "lucide-react"
 
+import { FlapText } from "@/components/flap-text"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -80,12 +81,20 @@ export function FlightScreen({ ticket }: { ticket: Ticket }) {
             {ticket.flightNumber} · Sitz {ticket.seat} · nach {ticket.destination.city}
           </p>
         </div>
-        <Badge variant={paused ? "secondary" : "outline"} className="mt-1">
+        {/* Flight mode annunciator: green for the engaged mode, amber when on hold */}
+        <Badge
+          variant="outline"
+          className={`mt-1 h-6 px-2.5 font-mono font-bold tracking-[0.15em] uppercase ${
+            paused && !landed
+              ? "border-primary/60 bg-primary/10 text-primary"
+              : "border-engaged/60 bg-engaged/10 text-engaged"
+          }`}
+        >
           {landed ? "Gelandet" : paused ? "Pausiert" : flightPhase(progress)}
         </Badge>
       </div>
 
-      <div className="relative aspect-square w-full overflow-hidden rounded-xl ring-1 ring-foreground/10">
+      <div className="relative aspect-square w-full overflow-hidden rounded-xl shadow-[0_0_0_1px_var(--color-border),0_1px_0_1px_var(--color-panel-highlight)]">
         <FlightMap
           origin={ticket.origin}
           destination={ticket.destination}
@@ -99,7 +108,7 @@ export function FlightScreen({ ticket }: { ticket: Ticket }) {
           size="sm"
           spacing={0}
           aria-label="Kartenmodus"
-          className="takeoff-reveal absolute top-2 right-2 z-[1100] bg-background/75 p-0.5 ring-1 ring-foreground/10 backdrop-blur-sm [--reveal-delay:1400ms]"
+          className="takeoff-reveal absolute top-2 right-2 z-[1100] bg-card/85 p-0.5 ring-1 ring-border backdrop-blur-sm [--reveal-delay:1400ms]"
         >
           {MAP_MODES.map(({ value, label }) => (
             <ToggleGroupItem key={value} value={value} className="rounded-md! px-2 text-xs">
@@ -111,14 +120,14 @@ export function FlightScreen({ ticket }: { ticket: Ticket }) {
 
       <div className="takeoff-reveal flex flex-col gap-4 [--reveal-delay:1400ms]">
         <div
-          className={`text-center font-mono text-6xl font-semibold tabular-nums tracking-tight transition-opacity ${paused ? "opacity-50" : ""}`}
+          className={`flex justify-center transition-opacity motion-reduce:transition-none ${paused ? "opacity-50" : ""}`}
           role="timer"
           aria-label="Verbleibende Zeit"
         >
-          {remaining}
+          <FlapText text={remaining} className={remaining.length > 5 ? "text-4xl" : "text-6xl"} />
         </div>
         <Progress value={progress * 100} aria-label="Flugfortschritt" />
-        <div className="flex justify-between font-mono text-xs text-muted-foreground">
+        <div className="flex justify-between font-mono text-xs font-bold tracking-widest text-muted-foreground">
           <span>{ticket.origin.iata}</span>
           <span>{Math.floor(progress * 100)} %</span>
           <span>{ticket.destination.iata}</span>

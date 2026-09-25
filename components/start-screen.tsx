@@ -61,7 +61,7 @@ export function StartScreen() {
             </Button>
           </>
         ) : (
-          <p className="rounded-xl border border-dashed px-4 py-6 text-center text-sm text-muted-foreground">
+          <p className="rounded-xl border border-dashed px-4 py-6 text-center font-mono text-xs tracking-widest text-muted-foreground uppercase">
             Wähle einen Abflughafen, um dein Ziel zu sehen.
           </p>
         )}
@@ -71,9 +71,5 @@ export function StartScreen() {
 }
 
 function SectionLabel({ children }: { children: React.ReactNode }) {
-  return (
-    <h2 className="text-xs font-medium uppercase tracking-widest text-muted-foreground">
-      {children}
-    </h2>
-  )
+  return <h2 className="panel-label">{children}</h2>
 }

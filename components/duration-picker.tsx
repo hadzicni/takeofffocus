@@ -14,9 +14,12 @@ export function DurationPicker({ value, onValueChange }: DurationPickerProps) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-baseline gap-1.5">
-        <span className="text-4xl font-semibold tabular-nums tracking-tight">{value}</span>
-        <span className="text-sm text-muted-foreground">Min</span>
+      {/* A selected value, so it reads cyan like a target set on the flight control unit */}
+      <div className="flex items-baseline gap-2 font-mono">
+        <span className="text-5xl font-bold tabular-nums text-selected">{value}</span>
+        <span className="text-xs font-bold tracking-[0.2em] text-muted-foreground uppercase">
+          Min
+        </span>
       </div>
       <Slider
         value={value}
@@ -37,7 +40,7 @@ export function DurationPicker({ value, onValueChange }: DurationPickerProps) {
           <ToggleGroupItem
             key={preset}
             value={String(preset)}
-            className="flex-1 tabular-nums data-pressed:border-primary data-pressed:bg-primary data-pressed:text-primary-foreground"
+            className="flex-1 tabular-nums"
           >
             {preset}
           </ToggleGroupItem>
