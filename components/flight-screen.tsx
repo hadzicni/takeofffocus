@@ -1,10 +1,10 @@
 "use client"
 
 import { useEffect, useState } from "react"
-import dynamic from "next/dynamic"
 import { PauseIcon, PlayIcon, Volume2Icon, VolumeXIcon, XIcon } from "lucide-react"
 
 import { FlapText } from "@/components/flap-text"
+import { FlightView } from "@/components/flight-view"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
@@ -17,12 +17,6 @@ import { elapsedMs, useFlightStore } from "@/lib/flight-store"
 import { announceLanding } from "@/lib/notifications"
 import { MAP_MODES, usePreferencesStore, type MapMode } from "@/lib/preferences-store"
 import type { Ticket } from "@/lib/ticket"
-
-// Leaflet touches `window` on import, so the map only renders in the browser.
-const FlightMap = dynamic(() => import("@/components/flight-map"), {
-  ssr: false,
-  loading: () => <div className="size-full animate-pulse bg-muted" />,
-})
 
 /** Re-render interval; keeps the plane moving smoothly without busy looping. */
 const TICK_MS = 250
@@ -94,14 +88,15 @@ export function FlightScreen({ ticket }: { ticket: Ticket }) {
         </Badge>
       </div>
 
-      <div className="relative aspect-square w-full overflow-hidden rounded-xl shadow-[0_0_0_1px_var(--color-border),0_1px_0_1px_var(--color-panel-highlight)]">
-        <FlightMap
+      <div className="relative aspect-[4/5] w-full overflow-hidden rounded-xl shadow-[0_0_0_1px_var(--color-border),0_1px_0_1px_var(--color-panel-highlight)]">
+        <FlightView
           origin={ticket.origin}
           destination={ticket.destination}
           progress={progress}
+          elapsedMs={elapsed}
           mode={mapMode}
         />
-        {/* Above Leaflet's panes and controls (z-index up to 1000) */}
+        {/* Above Leaflet's panes and controls (z-index up to 1000) and the 3D canvas */}
         <ToggleGroup
           value={[mapMode]}
           onValueChange={([mode]) => mode && setMapMode(mode as MapMode)}
