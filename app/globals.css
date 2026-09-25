@@ -39,6 +39,10 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-ticket: var(--ticket);
+  --color-ticket-foreground: var(--ticket-foreground);
+  --color-ticket-muted: var(--ticket-muted);
+  --color-ticket-accent: var(--ticket-accent);
   --radius-sm: calc(var(--radius) * 0.6);
   --radius-md: calc(var(--radius) * 0.8);
   --radius-lg: var(--radius);
@@ -82,7 +86,31 @@
   --sidebar-accent-foreground: oklch(0.95 0.01 250);
   --sidebar-border: oklch(1 0 0 / 9%);
   --sidebar-ring: oklch(0.8 0.14 72);
+  /* Boarding pass: warm paper with navy ink and an amber band */
+  --ticket: oklch(0.97 0.015 85);
+  --ticket-foreground: oklch(0.22 0.04 262);
+  --ticket-muted: oklch(0.52 0.03 262);
+  --ticket-accent: oklch(0.8 0.14 72);
   color-scheme: dark;
+}
+
+@layer components {
+  /* Perforated tear line: semicircle notches at both edges, dashed rule between */
+  .ticket-perforation {
+    --notch: 0.75rem;
+    position: relative;
+    height: calc(var(--notch) * 2);
+    background:
+      radial-gradient(circle at 0 50%, transparent var(--notch), var(--ticket) calc(var(--notch) + 0.5px)) left / 51% 100% no-repeat,
+      radial-gradient(circle at 100% 50%, transparent var(--notch), var(--ticket) calc(var(--notch) + 0.5px)) right / 51% 100% no-repeat;
+  }
+
+  .ticket-perforation::after {
+    content: "";
+    position: absolute;
+    inset: 50% calc(var(--notch) + 0.5rem) auto;
+    border-top: 2px dashed color-mix(in oklch, var(--ticket-muted) 45%, transparent);
+  }
 }
 
 @layer base {
