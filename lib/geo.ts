@@ -34,3 +34,35 @@ export function flightMinutes(distanceKm: number, speedKmh = CRUISE_SPEED_KMH): 
 export function distanceForMinutes(minutes: number, speedKmh = CRUISE_SPEED_KMH): number {
   return (minutes / 60) * speedKmh
 }
+
+const toDegrees = (radians: number) => (radians * 180) / Math.PI
+
+/**
+ * Shifts `to.lon` by ±360° so the straight line from `from` doesn't wrap
+ * around the globe when a route crosses the antimeridian.
+ */
+export function unwrapLongitude(from: Coordinates, to: Coordinates): Coordinates {
+  const delta = to.lon - from.lon
+  if (delta > 180) return { ...to, lon: to.lon - 360 }
+  if (delta < -180) return { ...to, lon: to.lon + 360 }
+  return to
+}
+
+/** Point at fraction `t` (0–1) along the straight map line between two points. */
+export function interpolate(from: Coordinates, to: Coordinates, t: number): Coordinates {
+  const end = unwrapLongitude(from, to)
+  return {
+    lat: from.lat + (end.lat - from.lat) * t,
+    lon: from.lon + (end.lon - from.lon) * t,
+  }
+}
+
+const mercatorY = (lat: number) => Math.log(Math.tan(Math.PI / 4 + toRadians(lat) / 2))
+
+/** Heading in degrees (0 = north, clockwise) of the straight line on a Web Mercator map. */
+export function mapBearing(from: Coordinates, to: Coordinates): number {
+  const end = unwrapLongitude(from, to)
+  const dx = toRadians(end.lon - from.lon)
+  const dy = mercatorY(end.lat) - mercatorY(from.lat)
+  return (toDegrees(Math.atan2(dx, dy)) + 360) % 360
+}

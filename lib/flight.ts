@@ -44,3 +44,14 @@ export function findRouteOptions(
   const matches = options.filter((option) => option.withinTolerance)
   return matches.length > 0 ? matches : options.slice(0, FALLBACK_OPTIONS)
 }
+
+export type FlightPhase = "Taxiing" | "Climbing" | "Cruising" | "Descending" | "Landing"
+
+/** Phase of flight for a progress value between 0 and 1. */
+export function flightPhase(progress: number): FlightPhase {
+  if (progress < 0.05) return "Taxiing"
+  if (progress < 0.15) return "Climbing"
+  if (progress < 0.85) return "Cruising"
+  if (progress < 0.95) return "Descending"
+  return "Landing"
+}

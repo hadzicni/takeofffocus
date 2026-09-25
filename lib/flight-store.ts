@@ -7,7 +7,7 @@ export const DURATION_PRESETS = [15, 25, 45, 60, 90] as const
 export const MIN_DURATION = 10
 export const MAX_DURATION = 180
 
-export type Phase = "setup" | "boarding" | "flight"
+export type Phase = "setup" | "boarding" | "flight" | "landed"
 
 type FlightState = {
   phase: Phase
@@ -18,25 +18,52 @@ type FlightState = {
   ticket: Ticket | null
   /** Epoch ms at which the focus session started. */
   departedAt: number | null
+  /** Epoch ms at which the session was paused, null while running. */
+  pausedAt: number | null
+  /** Total time spent paused before the current pause. */
+  pausedMs: number
   setOrigin: (origin: Airport | null) => void
   setDuration: (minutes: number) => void
   nextRoute: () => void
   issueTicket: (ticket: Ticket) => void
   cancelBoarding: () => void
   board: () => void
+  pause: () => void
+  resume: () => void
+  land: () => void
+  abort: () => void
 }
+
+const idleSession = { ticket: null, departedAt: null, pausedAt: null, pausedMs: 0 }
 
 export const useFlightStore = create<FlightState>()((set) => ({
   phase: "setup",
   origin: null,
   durationMinutes: 25,
   routeIndex: 0,
-  ticket: null,
-  departedAt: null,
+  ...idleSession,
   setOrigin: (origin) => set({ origin, routeIndex: 0 }),
   setDuration: (durationMinutes) => set({ durationMinutes, routeIndex: 0 }),
   nextRoute: () => set((state) => ({ routeIndex: state.routeIndex + 1 })),
   issueTicket: (ticket) => set({ ticket, phase: "boarding" }),
-  cancelBoarding: () => set({ ticket: null, phase: "setup" }),
-  board: () => set({ phase: "flight", departedAt: Date.now() }),
+  cancelBoarding: () => set({ ...idleSession, phase: "setup" }),
+  board: () => set({ phase: "flight", departedAt: Date.now(), pausedAt: null, pausedMs: 0 }),
+  pause: () => set((state) => (state.pausedAt ? {} : { pausedAt: Date.now() })),
+  resume: () =>
+    set((state) =>
+      state.pausedAt
+        ? { pausedAt: null, pausedMs: state.pausedMs + Date.now() - state.pausedAt }
+        : {}
+    ),
+  land: () => set({ phase: "landed" }),
+  abort: () => set({ ...idleSession, phase: "setup" }),
 }))
+
+/** Focus time elapsed at `now`, excluding pauses. */
+export function elapsedMs(
+  state: Pick<FlightState, "departedAt" | "pausedAt" | "pausedMs">,
+  now: number
+): number {
+  if (state.departedAt === null) return 0
+  return (state.pausedAt ?? now) - state.departedAt - state.pausedMs
+}
