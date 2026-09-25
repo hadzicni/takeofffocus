@@ -5,9 +5,8 @@ import { PlaneIcon, ShuffleIcon } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardFooter } from "@/components/ui/card"
 import type { Airport } from "@/lib/airports"
+import { formatKm } from "@/lib/format"
 import type { RouteOption } from "@/lib/flight"
-
-const km = new Intl.NumberFormat("de-CH", { maximumFractionDigits: 0 })
 
 type RoutePreviewProps = {
   origin: Airport
@@ -34,7 +33,7 @@ export function RoutePreview({ origin, route, focusMinutes, canShuffle, onShuffl
         </div>
 
         <dl className="grid grid-cols-3 gap-2 border-t pt-4 text-sm">
-          <Stat label="Distanz" value={`${km.format(route.distanceKm)} km`} />
+          <Stat label="Distanz" value={formatKm(route.distanceKm)} />
           <Stat label="Flugzeit" value={`ca. ${Math.round(route.flightMinutes)} Min`} />
           <Stat label="Fokus" value={`${focusMinutes} Min`} />
         </dl>

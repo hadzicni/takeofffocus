@@ -30,13 +30,16 @@ type FlightState = {
   board: () => void
   pause: () => void
   resume: () => void
-  land: () => void
+  /** Ends the flight; returns false if it had already landed. */
+  land: () => boolean
   abort: () => void
+  /** Back to setup for another flight from `origin`. */
+  newFlight: (origin: Airport) => void
 }
 
 const idleSession = { ticket: null, departedAt: null, pausedAt: null, pausedMs: 0 }
 
-export const useFlightStore = create<FlightState>()((set) => ({
+export const useFlightStore = create<FlightState>()((set, get) => ({
   phase: "setup",
   origin: null,
   durationMinutes: 25,
@@ -55,8 +58,13 @@ export const useFlightStore = create<FlightState>()((set) => ({
         ? { pausedAt: null, pausedMs: state.pausedMs + Date.now() - state.pausedAt }
         : {}
     ),
-  land: () => set({ phase: "landed" }),
+  land: () => {
+    if (get().phase !== "flight") return false
+    set({ phase: "landed" })
+    return true
+  },
   abort: () => set({ ...idleSession, phase: "setup" }),
+  newFlight: (origin) => set({ ...idleSession, phase: "setup", origin, routeIndex: 0 }),
 }))
 
 /** Focus time elapsed at `now`, excluding pauses. */

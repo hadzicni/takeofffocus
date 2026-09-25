@@ -9,6 +9,7 @@ import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
 import { flightPhase } from "@/lib/flight"
 import { elapsedMs, useFlightStore } from "@/lib/flight-store"
+import { announceLanding } from "@/lib/notifications"
 import type { Ticket } from "@/lib/ticket"
 
 // Leaflet touches `window` on import, so the map only renders in the browser.
@@ -30,15 +31,16 @@ function formatRemaining(ms: number) {
 }
 
 export function FlightScreen({ ticket }: { ticket: Ticket }) {
-  const { departedAt, pausedAt, pausedMs, pause, resume, land, abort } = useFlightStore()
+  const { phase, departedAt, pausedAt, pausedMs, pause, resume, land, abort } = useFlightStore()
   const [now, setNow] = useState(Date.now)
   const paused = pausedAt !== null
+  const landed = phase === "landed"
 
   useEffect(() => {
-    if (paused) return
+    if (paused || landed) return
     const id = setInterval(() => setNow(Date.now()), TICK_MS)
     return () => clearInterval(id)
-  }, [paused])
+  }, [paused, landed])
 
   const totalMs = ticket.durationMinutes * 60_000
   const elapsed = elapsedMs({ departedAt, pausedAt, pausedMs }, now)
@@ -47,16 +49,17 @@ export function FlightScreen({ ticket }: { ticket: Ticket }) {
   const route = `${ticket.origin.iata} → ${ticket.destination.iata}`
 
   useEffect(() => {
-    if (progress >= 1) land()
-  }, [progress, land])
+    if (progress >= 1 && land()) announceLanding(ticket)
+  }, [progress, land, ticket])
 
   useEffect(() => {
     const previousTitle = document.title
-    document.title = `${paused ? "⏸ " : ""}${remaining} · ${route}`
+    const status = landed ? "Gelandet" : `${paused ? "⏸ " : ""}${remaining}`
+    document.title = `${status} · ${route}`
     return () => {
       document.title = previousTitle
     }
-  }, [remaining, route, paused])
+  }, [remaining, route, paused, landed])
 
   return (
     <>
@@ -68,7 +71,7 @@ export function FlightScreen({ ticket }: { ticket: Ticket }) {
           </p>
         </div>
         <Badge variant={paused ? "secondary" : "outline"} className="mt-1">
-          {paused ? "Pausiert" : flightPhase(progress)}
+          {landed ? "Gelandet" : paused ? "Pausiert" : flightPhase(progress)}
         </Badge>
       </div>
 
@@ -92,26 +95,28 @@ export function FlightScreen({ ticket }: { ticket: Ticket }) {
         </div>
       </div>
 
-      <div className="flex flex-col gap-2">
-        <Button
-          size="lg"
-          variant={paused ? "default" : "outline"}
-          className="h-11 text-base"
-          onClick={() => {
-            if (!paused) return pause()
-            // Refresh `now` with the resume so elapsed time doesn't briefly jump back.
-            resume()
-            setNow(Date.now())
-          }}
-        >
-          {paused ? <PlayIcon /> : <PauseIcon />}
-          {paused ? "Fortsetzen" : "Pause"}
-        </Button>
-        <Button variant="ghost" onClick={abort}>
-          <XIcon />
-          Flug abbrechen
-        </Button>
-      </div>
+      {!landed && (
+        <div className="flex flex-col gap-2">
+          <Button
+            size="lg"
+            variant={paused ? "default" : "outline"}
+            className="h-11 text-base"
+            onClick={() => {
+              if (!paused) return pause()
+              // Refresh `now` with the resume so elapsed time doesn't briefly jump back.
+              resume()
+              setNow(Date.now())
+            }}
+          >
+            {paused ? <PlayIcon /> : <PauseIcon />}
+            {paused ? "Fortsetzen" : "Pause"}
+          </Button>
+          <Button variant="ghost" onClick={abort}>
+            <XIcon />
+            Flug abbrechen
+          </Button>
+        </div>
+      )}
     </>
   )
 }

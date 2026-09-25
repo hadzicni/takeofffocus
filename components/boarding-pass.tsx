@@ -3,11 +3,11 @@ import { PlaneIcon } from "lucide-react"
 import { Barcode } from "@/components/barcode"
 import { Card } from "@/components/ui/card"
 import type { Airport } from "@/lib/airports"
+import { formatKm } from "@/lib/format"
 import type { Ticket } from "@/lib/ticket"
 
 const time = new Intl.DateTimeFormat("de-CH", { hour: "2-digit", minute: "2-digit" })
 const date = new Intl.DateTimeFormat("de-CH", { day: "2-digit", month: "short" })
-const km = new Intl.NumberFormat("de-CH", { maximumFractionDigits: 0 })
 
 export function BoardingPass({ ticket }: { ticket: Ticket }) {
   const arrivesAt = ticket.issuedAt + ticket.durationMinutes * 60_000
@@ -26,7 +26,7 @@ export function BoardingPass({ ticket }: { ticket: Ticket }) {
           <div className="flex flex-1 flex-col items-center gap-1 text-ticket-muted">
             <PlaneIcon className="size-5 rotate-45 text-ticket-foreground" />
             <span className="text-[0.7rem] tabular-nums">
-              {km.format(ticket.distanceKm)} km
+              {formatKm(ticket.distanceKm)}
             </span>
           </div>
           <AirportCode airport={ticket.destination} align="end" />
