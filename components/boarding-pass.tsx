@@ -14,8 +14,8 @@ export function BoardingPass({ ticket }: { ticket: Ticket }) {
   const barcodeValue = `${ticket.flightNumber}${ticket.origin.iata}${ticket.destination.iata}${ticket.seat}${ticket.issuedAt}`
 
   return (
-    <Card className="boarding-pass gap-0 overflow-visible bg-transparent py-0 text-ticket-foreground ring-0 drop-shadow-xl">
-      <div className="flex items-center justify-between rounded-t-xl bg-ticket-accent px-5 py-2.5 text-xs font-semibold uppercase tracking-widest">
+    <Card className="boarding-pass gap-0 overflow-visible bg-transparent py-0 text-ticket-foreground ring-0 drop-shadow-[0_24px_40px_oklch(0_0_0/0.5)]">
+      <div className="flex items-center justify-between rounded-t-2xl bg-ticket-accent px-5 py-2.5 text-xs font-semibold uppercase tracking-widest">
         <span>TakeoffFocus</span>
         <span>Boarding Pass</span>
       </div>
@@ -44,7 +44,7 @@ export function BoardingPass({ ticket }: { ticket: Ticket }) {
 
       <div className="ticket-perforation" aria-hidden />
 
-      <div className="ticket-stub flex flex-col items-center gap-2 rounded-b-xl bg-ticket px-5 pt-2 pb-5">
+      <div className="ticket-stub flex flex-col items-center gap-2 rounded-b-2xl bg-ticket px-5 pt-2 pb-5">
         <Barcode code={barcodeValue} className="h-14 w-full" />
         <span className="font-mono text-[0.65rem] tracking-[0.3em] text-ticket-muted">
           {ticket.flightNumber.replace(" ", "")}

@@ -1,34 +1,36 @@
-import type { Metadata } from "next";
-import { B612, B612_Mono } from "next/font/google";
+import type { Metadata, Viewport } from "next";
+import { Geist_Mono, Inter } from "next/font/google";
 import { Toaster } from "@/components/ui/sonner";
 import "./globals.css";
 
-// B612: the typeface Airbus commissioned for cockpit displays, built for
-// legibility at a glance in low light.
-const b612 = B612({
-  variable: "--font-b612",
+// Inter with its optical-size axis: tight, confident display cuts for the big
+// numbers and headlines, open text cuts for everything small.
+const inter = Inter({
+  variable: "--font-inter",
   subsets: ["latin"],
-  weight: ["400", "700"],
+  axes: ["opsz"],
 });
 
-const b612Mono = B612_Mono({
-  variable: "--font-b612-mono",
+const geistMono = Geist_Mono({
+  variable: "--font-geist-mono",
   subsets: ["latin"],
-  weight: ["400", "700"],
 });
 
 export const metadata: Metadata = {
-  title: "TakeoffFocus",
-  description: "Fokus-Timer im Flugreise-Design",
+  title: "TakeoffFocus – Fokus, der abhebt",
+  description:
+    "Ein Fokus-Timer als Nachtflug: Wähle deine Dauer, steig ein und flieg über einen echten 3D-Globus, während du dich konzentrierst.",
+};
+
+export const viewport: Viewport = {
+  themeColor: "#0b0e1a",
+  viewportFit: "cover",
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
   return (
-    <html
-      lang="de"
-      className={`dark ${b612.variable} ${b612Mono.variable} h-full antialiased`}
-    >
-      <body className="min-h-full flex flex-col">
+    <html lang="de" className={`dark ${inter.variable} ${geistMono.variable} antialiased`}>
+      <body>
         {children}
         <Toaster position="top-center" />
       </body>

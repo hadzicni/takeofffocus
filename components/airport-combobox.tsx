@@ -69,14 +69,14 @@ export function AirportCombobox({ value, onValueChange }: AirportComboboxProps) 
           <ComboboxInput
             placeholder="Flughafen, Stadt oder IATA-Code"
             aria-label="Abflughafen"
-            className="h-10 flex-1"
+            className="h-12 flex-1 rounded-xl bg-white/[0.04] text-base md:text-sm"
           />
           <ComboboxContent>
             <ComboboxEmpty>Kein Flughafen gefunden.</ComboboxEmpty>
             <ComboboxList>
               {(airport: Airport) => (
-                <ComboboxItem key={airport.iata} value={airport} className="py-1.5">
-                  <span className="w-10 shrink-0 font-mono font-semibold tracking-wide text-primary">
+                <ComboboxItem key={airport.iata} value={airport} className="gap-3 rounded-lg py-2">
+                  <span className="grid h-7 w-11 shrink-0 place-items-center rounded-md bg-white/[0.06] font-mono text-xs font-semibold tracking-wide">
                     {airport.iata}
                   </span>
                   <span className="flex min-w-0 flex-col">
@@ -93,9 +93,9 @@ export function AirportCombobox({ value, onValueChange }: AirportComboboxProps) 
           </ComboboxContent>
         </Combobox>
         <Button
-          variant="outline"
+          variant="secondary"
           size="icon"
-          className="size-10"
+          className="size-12 rounded-xl"
           onClick={locate}
           disabled={locating}
           aria-label="Nächstgelegenen Flughafen verwenden"

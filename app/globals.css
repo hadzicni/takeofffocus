@@ -7,8 +7,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-b612);
-  --font-mono: var(--font-b612-mono);
+  --font-sans: var(--font-inter);
+  --font-mono: var(--font-geist-mono);
   --font-heading: var(--font-sans);
   --color-sidebar-ring: var(--sidebar-ring);
   --color-sidebar-border: var(--sidebar-border);
@@ -39,81 +39,101 @@
   --color-popover: var(--popover);
   --color-card-foreground: var(--card-foreground);
   --color-card: var(--card);
+  --color-surface: var(--surface);
   --color-route: var(--route);
-  --color-selected: var(--selected);
-  --color-engaged: var(--engaged);
-  --color-panel-highlight: var(--panel-highlight);
+  --color-sky: var(--sky);
+  --color-live: var(--live);
   --color-ticket: var(--ticket);
   --color-ticket-foreground: var(--ticket-foreground);
   --color-ticket-muted: var(--ticket-muted);
   --color-ticket-accent: var(--ticket-accent);
-  --radius-sm: calc(var(--radius) * 0.6);
-  --radius-md: calc(var(--radius) * 0.8);
+  --radius-sm: calc(var(--radius) * 0.5);
+  --radius-md: calc(var(--radius) * 0.75);
   --radius-lg: var(--radius);
-  --radius-xl: calc(var(--radius) * 1.4);
-  --radius-2xl: calc(var(--radius) * 1.8);
-  --radius-3xl: calc(var(--radius) * 2.2);
-  --radius-4xl: calc(var(--radius) * 2.6);
+  --radius-xl: calc(var(--radius) * 1.25);
+  --radius-2xl: calc(var(--radius) * 1.5);
+  --radius-3xl: calc(var(--radius) * 2);
+  --radius-4xl: calc(var(--radius) * 2.5);
+  --ease-out-expo: cubic-bezier(0.16, 1, 0.3, 1);
 }
 
 :root {
   /*
-   * Glass cockpit at night. The page is the instrument panel (slate), surfaces
-   * are displays recessed into it (near-black glass), and colour follows
-   * avionics convention rather than decoration:
-   *   amber   --primary   things you press; the own-ship symbol
-   *   cyan    --selected  values the pilot has selected (focus ring, toggles, sliders)
-   *   green   --engaged   the mode that is active right now
-   *   magenta --route     the active flight plan: route line and progress
+   * Premium night flight. The globe is the stage; everything else floats over
+   * it as frosted glass. One brand colour, used sparingly:
+   *   gold  --primary / --route   actions and the flight path
+   *   sky   --sky / --ring        focus and selection
+   *   green --live                "in the air right now"
    */
-  --background: oklch(0.2 0.014 245);
-  --foreground: oklch(0.96 0.006 240);
-  --panel-highlight: oklch(0.26 0.016 245);
-  --card: oklch(0.13 0.012 250);
-  --card-foreground: oklch(0.96 0.006 240);
-  --popover: oklch(0.13 0.012 250);
-  --popover-foreground: oklch(0.96 0.006 240);
-  --primary: oklch(0.83 0.16 78);
-  --primary-foreground: oklch(0.17 0.03 60);
-  --secondary: oklch(0.26 0.014 245);
-  --secondary-foreground: oklch(0.96 0.006 240);
-  --muted: oklch(0.24 0.014 245);
-  --muted-foreground: oklch(0.74 0.018 240);
-  --accent: oklch(0.28 0.02 240);
-  --accent-foreground: oklch(0.96 0.006 240);
-  --destructive: oklch(0.7 0.2 25);
-  --border: oklch(0.34 0.014 245);
-  --input: oklch(0.38 0.016 245);
-  --ring: oklch(0.86 0.13 205);
-  --selected: oklch(0.86 0.13 205);
-  --engaged: oklch(0.86 0.2 148);
-  --route: oklch(0.73 0.25 332);
-  --chart-1: oklch(0.73 0.25 332);
-  --chart-2: oklch(0.86 0.13 205);
-  --chart-3: oklch(0.86 0.2 148);
-  --chart-4: oklch(0.83 0.16 78);
-  --chart-5: oklch(0.74 0.018 240);
-  /* Small radii, bevelled (see corner-shape below): chamfered bezels, not pills */
-  --radius: 0.5rem;
-  --sidebar: oklch(0.13 0.012 250);
-  --sidebar-foreground: oklch(0.96 0.006 240);
-  --sidebar-primary: oklch(0.83 0.16 78);
-  --sidebar-primary-foreground: oklch(0.17 0.03 60);
-  --sidebar-accent: oklch(0.28 0.02 240);
-  --sidebar-accent-foreground: oklch(0.96 0.006 240);
-  --sidebar-border: oklch(0.34 0.014 245);
-  --sidebar-ring: oklch(0.86 0.13 205);
-  /* Split-flap departure board tiles */
-  --flap: oklch(0.17 0.006 250);
-  --flap-lower: oklch(0.14 0.006 250);
-  --flap-foreground: oklch(0.97 0.02 95);
-  --flap-seam: oklch(0.05 0 0);
-  /* Boarding pass: warm paper with navy ink and an amber band */
-  --ticket: oklch(0.97 0.015 85);
+  --background: oklch(0.13 0.028 266);
+  --foreground: oklch(0.97 0.005 265);
+  /* Frosted panels over the globe (see the glass utility) */
+  --surface: oklch(0.17 0.03 266 / 0.66);
+  --surface-edge: oklch(1 0 0 / 0.07);
+  /* Cards inside panels: a faint lift, not another slab */
+  --card: oklch(1 0 0 / 0.045);
+  --card-foreground: oklch(0.97 0.005 265);
+  --popover: oklch(0.18 0.03 266);
+  --popover-foreground: oklch(0.97 0.005 265);
+  --primary: oklch(0.84 0.13 80);
+  --primary-foreground: oklch(0.21 0.035 70);
+  --secondary: oklch(1 0 0 / 0.08);
+  --secondary-foreground: oklch(0.97 0.005 265);
+  --muted: oklch(1 0 0 / 0.07);
+  --muted-foreground: oklch(0.74 0.022 265);
+  --accent: oklch(1 0 0 / 0.09);
+  --accent-foreground: oklch(0.97 0.005 265);
+  --destructive: oklch(0.7 0.19 25);
+  --border: oklch(1 0 0 / 0.1);
+  --input: oklch(1 0 0 / 0.14);
+  --ring: oklch(0.8 0.11 235);
+  --route: oklch(0.87 0.14 80);
+  --sky: oklch(0.8 0.11 235);
+  --live: oklch(0.82 0.17 155);
+  --chart-1: oklch(0.84 0.13 80);
+  --chart-2: oklch(0.8 0.11 235);
+  --chart-3: oklch(0.82 0.17 155);
+  --chart-4: oklch(0.7 0.12 300);
+  --chart-5: oklch(0.74 0.022 265);
+  --radius: 0.875rem;
+  --sidebar: oklch(0.18 0.03 266);
+  --sidebar-foreground: oklch(0.97 0.005 265);
+  --sidebar-primary: oklch(0.84 0.13 80);
+  --sidebar-primary-foreground: oklch(0.21 0.035 70);
+  --sidebar-accent: oklch(1 0 0 / 0.09);
+  --sidebar-accent-foreground: oklch(0.97 0.005 265);
+  --sidebar-border: oklch(1 0 0 / 0.1);
+  --sidebar-ring: oklch(0.8 0.11 235);
+  /* Departure-board tiles */
+  --flap: oklch(0.22 0.025 266);
+  --flap-lower: oklch(0.19 0.025 266);
+  --flap-foreground: oklch(0.98 0.01 90);
+  /* Boarding pass: warm paper with navy ink and a gold band */
+  --ticket: oklch(0.97 0.012 85);
   --ticket-foreground: oklch(0.22 0.04 262);
   --ticket-muted: oklch(0.52 0.03 262);
-  --ticket-accent: oklch(0.83 0.16 78);
+  --ticket-accent: oklch(0.84 0.13 80);
   color-scheme: dark;
+}
+
+/* Frosted glass panel floating over the globe */
+@utility glass {
+  background-color: var(--surface);
+  backdrop-filter: blur(24px) saturate(150%);
+  -webkit-backdrop-filter: blur(24px) saturate(150%);
+  border: 1px solid var(--border);
+  box-shadow:
+    inset 0 1px 0 var(--surface-edge),
+    0 30px 80px -30px oklch(0 0 0 / 0.75);
+}
+
+/* Small caps label above a value or section */
+@utility eyebrow {
+  font-size: 0.6875rem;
+  font-weight: 600;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--muted-foreground);
 }
 
 @layer components {
@@ -134,127 +154,61 @@
     border-top: 2px dashed color-mix(in oklch, var(--ticket-muted) 45%, transparent);
   }
 
-  /* ---- Instrument skin for the shadcn primitives (keyed on data-slot) ---- */
-
-  /* Displays: recessed glass with a faint glare along the top edge */
-  [data-slot="card"]:not(.boarding-pass),
-  [data-slot="dialog-content"],
-  [data-slot="combobox-content"] {
-    background-image: linear-gradient(172deg, oklch(1 0 0 / 0.045), transparent 38%);
-    box-shadow:
-      inset 0 2px 12px oklch(0 0 0 / 0.55),
-      0 0 0 1px var(--border),
-      0 1px 0 1px var(--panel-highlight);
-  }
-
-  /* Button legends, set like the engraved labels on a flight-deck panel */
-  [data-slot="button"],
-  [data-slot="toggle"],
-  [data-slot="toggle-group-item"] {
-    font-family: var(--font-mono);
-    font-weight: 700;
-    text-transform: uppercase;
-    letter-spacing: 0.08em;
-  }
-
-  /* Primary push buttons are backlit: a lit top edge and a pressed-in lower lip */
+  /* Primary actions carry a soft gold glow and a lit top edge */
   [data-slot="button"][data-variant="default"] {
     box-shadow:
-      inset 0 1px 0 oklch(1 0 0 / 0.4),
-      inset 0 -2px 0 oklch(0 0 0 / 0.22),
-      0 0 18px -4px color-mix(in oklch, var(--primary) 55%, transparent);
+      inset 0 1px 0 oklch(1 0 0 / 0.35),
+      0 10px 30px -10px color-mix(in oklch, var(--primary) 70%, transparent);
   }
 
-  /* Selected toggles light up cyan, like a pilot-selected value */
   [data-slot="toggle"][data-pressed],
   [data-slot="toggle-group-item"][data-pressed] {
-    color: var(--selected);
-    background-color: color-mix(in oklch, var(--selected) 12%, transparent);
-    box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--selected) 70%, transparent);
+    color: var(--foreground);
+    box-shadow: inset 0 0 0 1px oklch(1 0 0 / 0.16);
   }
 
-  /* Tape scales: tick marks along slider and progress tracks */
-  [data-slot="slider-track"],
-  [data-slot="progress-track"] {
-    background-image: repeating-linear-gradient(
-      to right,
-      transparent 0 calc(10% - 1px),
-      oklch(1 0 0 / 0.22) calc(10% - 1px) 10%
-    );
-  }
-
-  /* Annunciator label: engraved caps with a cyan index tick */
-  .panel-label {
-    display: flex;
-    align-items: center;
-    gap: 0.5rem;
-    font-family: var(--font-mono);
-    font-size: 0.7rem;
-    font-weight: 700;
-    letter-spacing: 0.2em;
-    text-transform: uppercase;
-    color: var(--muted-foreground);
-  }
-
-  .panel-label::before {
-    content: "";
-    width: 0.75rem;
-    height: 2px;
-    background: var(--selected);
-  }
-
-  .panel-label::after {
-    content: "";
-    flex: 1;
-    height: 1px;
-    background: linear-gradient(to right, var(--border), transparent);
-  }
-
-  /* Split-flap tiles (FlapText). Two halves with a hairline seam, like a Solari board. */
+  /* Departure-board tiles (FlapText) */
   .flap {
     position: relative;
     display: inline-grid;
     place-items: center;
-    min-width: 1.1em;
-    margin-inline: 0.035em;
-    padding: 0.06em 0.05em;
-    border-radius: 0.1em;
+    min-width: 1.05em;
+    margin-inline: 0.03em;
+    padding: 0.04em 0.06em;
+    border-radius: 0.14em;
     background: linear-gradient(to bottom, var(--flap) 50%, var(--flap-lower) 50%);
     color: var(--flap-foreground);
     font-family: var(--font-mono);
-    font-weight: 700;
-    line-height: 1.1;
+    font-weight: 600;
+    line-height: 1.12;
     box-shadow:
-      inset 0 1px 0 oklch(1 0 0 / 0.07),
-      0 1px 2px oklch(0 0 0 / 0.6);
+      inset 0 1px 0 oklch(1 0 0 / 0.08),
+      0 2px 6px oklch(0 0 0 / 0.35);
   }
 
   .flap::after {
     content: "";
     position: absolute;
-    inset: calc(50% - 0.02em) 0 auto;
-    height: 0.04em;
-    min-height: 1px;
-    background: var(--flap-seam);
+    inset: calc(50% - 0.5px) 0 auto;
+    height: 1px;
+    background: oklch(0 0 0 / 0.45);
   }
 
   .flap-separator {
     display: inline-block;
-    margin-inline: 0.05em;
-    font-family: var(--font-mono);
-    font-weight: 700;
+    margin-inline: 0.08em;
     color: var(--muted-foreground);
   }
 }
 
-/* Leaflet overrides; unlayered so they beat leaflet.css */
+/* ---- Leaflet (2D fallback map); unlayered so it beats leaflet.css ---- */
 .leaflet-container {
-  background: var(--card);
+  background: var(--background);
   font-family: var(--font-sans);
 }
 
 .leaflet-control-attribution.leaflet-control {
-  background: color-mix(in oklch, var(--card) 75%, transparent);
+  background: color-mix(in oklch, var(--background) 70%, transparent);
   color: var(--muted-foreground);
   font-size: 0.625rem;
 }
@@ -272,30 +226,34 @@
   stroke: var(--route);
   stroke-width: 2;
   stroke-dasharray: 4 6;
-  stroke-opacity: 0.55;
+  stroke-opacity: 0.5;
 }
 
 .flight-airport {
-  stroke: var(--selected);
+  stroke: var(--foreground);
   stroke-width: 2;
-  fill: var(--card);
+  fill: var(--background);
   fill-opacity: 1;
 }
 
-.leaflet-tooltip.flight-airport-label {
-  background: color-mix(in oklch, var(--card) 85%, transparent);
-  color: var(--selected);
-  border: 1px solid color-mix(in oklch, var(--selected) 40%, transparent);
-  border-radius: calc(var(--radius) * 0.6);
+.leaflet-tooltip.flight-airport-label,
+.globe-label {
+  background: color-mix(in oklch, var(--background) 72%, transparent);
+  color: var(--foreground);
+  border: 1px solid var(--border);
+  border-radius: 999px;
   box-shadow: none;
-  padding: 0.125rem 0.375rem;
+  padding: 0.125rem 0.5rem;
   font-family: var(--font-mono);
+  font-size: 0.7rem;
   font-weight: 600;
-  letter-spacing: 0.05em;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  backdrop-filter: blur(8px);
 }
 
 .leaflet-tooltip-top.flight-airport-label::before {
-  border-top-color: color-mix(in oklch, var(--selected) 40%, transparent);
+  border-top-color: var(--border);
 }
 
 .flight-map {
@@ -303,21 +261,12 @@
   width: 100%;
   height: 100%;
   overflow: hidden;
-  background: var(--card);
+  background: var(--background);
 }
 
-/* Airport idents on the 3D globe (drei <Html> overlays) */
+/* Airport idents on the 3D globe (drei <Html> overlays), lifted above the ring */
 .globe-label {
-  padding: 0.125rem 0.375rem;
   transform: translateY(-1.1rem);
-  background: color-mix(in oklch, var(--card) 80%, transparent);
-  border: 1px solid color-mix(in oklch, var(--selected) 40%, transparent);
-  color: var(--selected);
-  font-family: var(--font-mono);
-  font-size: 0.7rem;
-  font-weight: 700;
-  letter-spacing: 0.08em;
-  white-space: nowrap;
   transition: opacity 200ms ease-out;
 }
 
@@ -331,17 +280,31 @@
   width: 100%;
   height: 100%;
   fill: var(--primary);
-  stroke: var(--card);
+  stroke: var(--background);
   stroke-width: 1;
 }
 
+/* Starfield behind everything when WebGL is unavailable (and while the globe loads) */
+.night-sky {
+  background:
+    radial-gradient(1px 1px at 12% 18%, oklch(1 0 0 / 0.7), transparent),
+    radial-gradient(1px 1px at 72% 12%, oklch(1 0 0 / 0.5), transparent),
+    radial-gradient(1.5px 1.5px at 38% 64%, oklch(1 0 0 / 0.6), transparent),
+    radial-gradient(1px 1px at 86% 58%, oklch(1 0 0 / 0.45), transparent),
+    radial-gradient(1px 1px at 55% 88%, oklch(1 0 0 / 0.5), transparent),
+    radial-gradient(1px 1px at 22% 82%, oklch(1 0 0 / 0.4), transparent),
+    radial-gradient(1.5px 1.5px at 92% 30%, oklch(1 0 0 / 0.55), transparent),
+    radial-gradient(90% 70% at 70% 45%, oklch(0.3 0.08 255 / 0.55), transparent 70%),
+    var(--background);
+}
+
 /*
- * Departure board: tiles flip in only when a destination is announced on the
- * start screen. The in-flight timer never flips; the cockpit stays still.
+ * Departure board: tiles flip in when a destination is announced in the
+ * planner. The in-flight timer never flips.
  */
 @media (prefers-reduced-motion: no-preference) {
   .flap[data-animate] {
-    animation: flap-in 360ms calc(var(--flap-index, 0) * 45ms) cubic-bezier(0.3, 0, 0.2, 1) both;
+    animation: flap-in 380ms calc(var(--flap-index, 0) * 45ms) var(--ease-out-expo) both;
   }
 }
 
@@ -350,26 +313,20 @@
     transform: perspective(12em) rotateX(-90deg);
     filter: brightness(0.5);
   }
-  65% {
-    transform: perspective(12em) rotateX(10deg);
-  }
 }
 
 /*
  * Takeoff: the one orchestrated moment of the app, from "Boarding" to cruise.
- *   0 ms       stub tears off the boarding pass              (--stub-tear)
- *   250 ms     pass lifts away                               (--pass-lift)
- *   650 ms     flight screen mounts, header fades in, then either
- *     3D globe (lib/globe-flight.ts, TAKEOFF):
- *              establishing shot from space down to the runway (3.4 s),
- *              then takeoff roll and climb through the clouds (4 s)
- *     2D fallback (flight-map.tsx):
- *              map flies out from the origin (TAKEOFF_CAMERA_S) while the
- *              plane icon lifts off: grows, its shadow drops away (--liftoff)
- *   +1400 ms   timer, progress and controls settle in         (--reveal)
- * Everything else in the app stays still so this reads as a single gesture.
- * With reduced motion the boarding pass simply swaps to the flight screen,
- * and the globe or map opens on a still view of the whole route.
+ *   0 ms       stub tears off the boarding pass              (stub-tear)
+ *   250 ms     pass and planner panel lift away              (pass-lift)
+ *   650 ms     flight begins; the globe camera, already framing the route,
+ *              dives from there to the runway (lib/globe-flight.ts, TAKEOFF:
+ *              3.4 s), then takeoff roll and climb through the clouds (4 s).
+ *              2D fallback: the map flies out from the origin while the plane
+ *              icon lifts off (flight-map.tsx, liftoff)
+ *   +1400 ms   the flight HUD settles in                     (reveal)
+ * Everything else stays still so this reads as a single gesture. With reduced
+ * motion the panels simply swap and the globe holds a still view of the route.
  */
 @media (prefers-reduced-motion: no-preference) {
   [data-departing] .ticket-stub {
@@ -386,13 +343,56 @@
     transition: opacity 250ms ease-out;
   }
 
+  /* The emptied panel dissolves just before the camera starts its dive */
+  section[data-departing] {
+    animation: panel-leave 300ms 350ms ease-in forwards;
+  }
+
   .flight-plane-liftoff {
     animation: liftoff 2200ms 300ms cubic-bezier(0.3, 0, 0.2, 1) both;
   }
 
   .takeoff-reveal {
-    animation: reveal 600ms var(--reveal-delay, 0ms) cubic-bezier(0.2, 0, 0, 1) both;
+    animation: reveal 700ms var(--reveal-delay, 0ms) var(--ease-out-expo) both;
   }
+
+  /* Panels entering (planner, boarding) */
+  .panel-enter {
+    animation: panel-enter 600ms var(--ease-out-expo) both;
+  }
+
+  /* The HUD recedes while you focus and returns on any interaction */
+  .hud-chrome {
+    transition:
+      opacity 600ms ease,
+      transform 600ms var(--ease-out-expo);
+  }
+
+  .hud-panel {
+    transition:
+      background-color 800ms ease,
+      border-color 800ms ease,
+      box-shadow 800ms ease;
+  }
+}
+
+[data-idle] .hud-chrome {
+  opacity: 0;
+  transform: translateY(0.5rem);
+  pointer-events: none;
+}
+
+/* In focus mode the timer floats on its own over the globe */
+[data-idle] .hud-panel {
+  background-color: transparent;
+  border-color: transparent;
+  box-shadow: none;
+  backdrop-filter: none;
+  -webkit-backdrop-filter: none;
+}
+
+[data-idle] .hud-timer {
+  text-shadow: 0 2px 30px oklch(0 0 0 / 0.6);
 }
 
 @keyframes stub-tear {
@@ -421,7 +421,21 @@
 
 @keyframes reveal {
   from {
+    transform: translateY(0.75rem);
+    opacity: 0;
+  }
+}
+
+@keyframes panel-leave {
+  to {
+    opacity: 0;
     transform: translateY(0.5rem);
+  }
+}
+
+@keyframes panel-enter {
+  from {
+    transform: translateY(1rem) scale(0.985);
     opacity: 0;
   }
 }
@@ -430,31 +444,16 @@
   * {
     @apply border-border outline-ring/50;
   }
-  /*
-   * Every radius is bevelled: chamfered corners like instrument bezels and
-   * luggage tags. Pills become hexagons, round thumbs become diamond "bugs".
-   * Browsers without corner-shape fall back to plain small radii.
-   */
-  *,
-  ::before,
-  ::after {
-    corner-shape: bevel;
-  }
-  /* The boarding pass is paper, not hardware: it keeps soft corners. */
-  .boarding-pass,
-  .boarding-pass * {
-    corner-shape: round;
+  html,
+  body {
+    @apply h-full overflow-hidden;
   }
   body {
     @apply bg-background text-foreground;
-    /* Panel: a dim flood light from above over faintly brushed metal */
-    background-image:
-      radial-gradient(120% 55% at 50% -10%, var(--panel-highlight), transparent 70%),
-      repeating-linear-gradient(0deg, oklch(1 0 0 / 0.012) 0 1px, transparent 1px 3px);
-    background-attachment: fixed;
+    font-feature-settings: "cv11", "ss01";
   }
   ::selection {
-    background: color-mix(in oklch, var(--selected) 35%, transparent);
+    background: color-mix(in oklch, var(--sky) 35%, transparent);
   }
   html {
     @apply font-sans;

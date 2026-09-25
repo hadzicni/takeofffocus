@@ -3,7 +3,7 @@
 import "leaflet/dist/leaflet.css"
 
 import { useEffect, useMemo, useState } from "react"
-import { divIcon, latLngBounds, type LatLngBounds, type LatLngTuple, type PointTuple } from "leaflet"
+import { divIcon, latLngBounds, type FitBoundsOptions, type LatLngBounds, type LatLngTuple } from "leaflet"
 import { CircleMarker, MapContainer, Marker, Polyline, TileLayer, Tooltip, useMap } from "react-leaflet"
 
 import { usePrefersReducedMotion } from "@/hooks/use-prefers-reduced-motion"
@@ -41,7 +41,8 @@ const TILES: Record<FlatMapMode, { url: string; attribution: string; subdomains:
   },
 }
 
-const ROUTE_PADDING: PointTuple = [48, 48]
+/** Keeps the route clear of the flight HUD: route chip on top, timer panel below. */
+const ROUTE_PADDING: FitBoundsOptions = { paddingTopLeft: [48, 150], paddingBottomRight: [48, 320] }
 
 /** Takeoff camera: starts close on the origin, then flies out to the whole route. */
 const TAKEOFF_ZOOM = 9
@@ -75,7 +76,7 @@ export default function FlightMap({ origin, destination, progress, mode, intro }
   const position = interpolate(origin, end, progress)
   const initialView = playIntro
     ? { center: toLatLng(origin), zoom: TAKEOFF_ZOOM }
-    : { bounds, boundsOptions: { padding: ROUTE_PADDING } }
+    : { bounds, boundsOptions: ROUTE_PADDING }
   const tiles = TILES[mode]
 
   return (
@@ -128,7 +129,7 @@ function TakeoffCamera({ bounds }: { bounds: LatLngBounds }) {
 
   useEffect(() => {
     const id = setTimeout(
-      () => map.flyToBounds(bounds, { padding: ROUTE_PADDING, duration: TAKEOFF_CAMERA_S }),
+      () => map.flyToBounds(bounds, { ...ROUTE_PADDING, duration: TAKEOFF_CAMERA_S }),
       TAKEOFF_CAMERA_DELAY_MS
     )
     return () => clearTimeout(id)

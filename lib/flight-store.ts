@@ -22,6 +22,8 @@ type FlightState = {
   pausedAt: number | null
   /** Total time spent paused before the current pause. */
   pausedMs: number
+  /** Epoch ms of the last resume; a floor for "now" until the clock re-ticks. */
+  resumedAt: number | null
   setOrigin: (origin: Airport | null) => void
   setDuration: (minutes: number) => void
   nextRoute: () => void
@@ -37,7 +39,7 @@ type FlightState = {
   newFlight: (origin: Airport) => void
 }
 
-const idleSession = { ticket: null, departedAt: null, pausedAt: null, pausedMs: 0 }
+const idleSession = { ticket: null, departedAt: null, pausedAt: null, pausedMs: 0, resumedAt: null }
 
 export const useFlightStore = create<FlightState>()((set, get) => ({
   phase: "setup",
@@ -50,12 +52,17 @@ export const useFlightStore = create<FlightState>()((set, get) => ({
   nextRoute: () => set((state) => ({ routeIndex: state.routeIndex + 1 })),
   issueTicket: (ticket) => set({ ticket, phase: "boarding" }),
   cancelBoarding: () => set({ ...idleSession, phase: "setup" }),
-  board: () => set({ phase: "flight", departedAt: Date.now(), pausedAt: null, pausedMs: 0 }),
+  board: () =>
+    set({ phase: "flight", departedAt: Date.now(), pausedAt: null, pausedMs: 0, resumedAt: null }),
   pause: () => set((state) => (state.pausedAt ? {} : { pausedAt: Date.now() })),
   resume: () =>
     set((state) =>
       state.pausedAt
-        ? { pausedAt: null, pausedMs: state.pausedMs + Date.now() - state.pausedAt }
+        ? {
+            pausedAt: null,
+            pausedMs: state.pausedMs + Date.now() - state.pausedAt,
+            resumedAt: Date.now(),
+          }
         : {}
     ),
   land: () => {
@@ -69,9 +76,10 @@ export const useFlightStore = create<FlightState>()((set, get) => ({
 
 /** Focus time elapsed at `now`, excluding pauses. */
 export function elapsedMs(
-  state: Pick<FlightState, "departedAt" | "pausedAt" | "pausedMs">,
+  state: Pick<FlightState, "departedAt" | "pausedAt" | "pausedMs" | "resumedAt">,
   now: number
 ): number {
   if (state.departedAt === null) return 0
-  return (state.pausedAt ?? now) - state.departedAt - state.pausedMs
+  const current = state.pausedAt ?? Math.max(now, state.resumedAt ?? 0)
+  return Math.max(0, current - state.departedAt - state.pausedMs)
 }
