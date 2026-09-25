@@ -164,6 +164,66 @@
   border-top-color: var(--border);
 }
 
+/* Map modes. Night 3D tilts the whole stage; the horizon fade hides the far edge. */
+.flight-map {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+  background: var(--background);
+}
+
+.flight-map-stage {
+  width: 100%;
+  height: 100%;
+  transform-origin: 50% 65%;
+}
+
+.flight-map[data-mode="night"] .flight-map-stage {
+  transform: perspective(900px) rotateX(32deg) scale(1.3)
+    translate(var(--parallax-x, 0), var(--parallax-y, 0));
+}
+
+/* Deep-navy tint over the grey night tiles, drawn from the theme tokens */
+.flight-map[data-mode="night"] .leaflet-tile-pane {
+  filter: brightness(0.85) contrast(1.1);
+}
+
+.flight-map[data-mode="night"] .leaflet-tile-pane::after {
+  content: "";
+  position: absolute;
+  inset: -100vmax;
+  background: var(--background);
+  mix-blend-mode: color;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+.flight-map-horizon {
+  position: absolute;
+  inset: 0 0 auto;
+  height: 35%;
+  background: linear-gradient(to bottom, var(--background), transparent);
+  opacity: 0;
+  pointer-events: none;
+  z-index: 1000;
+}
+
+.flight-map[data-mode="night"] .flight-map-horizon {
+  opacity: 1;
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .flight-map-stage {
+    /* Also smooths the 250 ms parallax steps into a continuous drift */
+    transition: transform 900ms cubic-bezier(0.2, 0, 0, 1);
+  }
+
+  .flight-map-horizon {
+    transition: opacity 600ms ease-out;
+  }
+}
+
 .flight-plane-body {
   width: 100%;
   height: 100%;

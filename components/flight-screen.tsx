@@ -7,9 +7,11 @@ import { PauseIcon, PlayIcon, XIcon } from "lucide-react"
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
 import { flightPhase } from "@/lib/flight"
 import { elapsedMs, useFlightStore } from "@/lib/flight-store"
 import { announceLanding } from "@/lib/notifications"
+import { MAP_MODES, usePreferencesStore, type MapMode } from "@/lib/preferences-store"
 import type { Ticket } from "@/lib/ticket"
 
 // Leaflet touches `window` on import, so the map only renders in the browser.
@@ -32,6 +34,7 @@ function formatRemaining(ms: number) {
 
 export function FlightScreen({ ticket }: { ticket: Ticket }) {
   const { phase, departedAt, pausedAt, pausedMs, pause, resume, land, abort } = useFlightStore()
+  const { mapMode, setMapMode } = usePreferencesStore()
   const [now, setNow] = useState(Date.now)
   const paused = pausedAt !== null
   const landed = phase === "landed"
@@ -75,8 +78,28 @@ export function FlightScreen({ ticket }: { ticket: Ticket }) {
         </Badge>
       </div>
 
-      <div className="aspect-square w-full overflow-hidden rounded-xl ring-1 ring-foreground/10">
-        <FlightMap origin={ticket.origin} destination={ticket.destination} progress={progress} />
+      <div className="relative aspect-square w-full overflow-hidden rounded-xl ring-1 ring-foreground/10">
+        <FlightMap
+          origin={ticket.origin}
+          destination={ticket.destination}
+          progress={progress}
+          mode={mapMode}
+        />
+        {/* Above Leaflet's panes and controls (z-index up to 1000) */}
+        <ToggleGroup
+          value={[mapMode]}
+          onValueChange={([mode]) => mode && setMapMode(mode as MapMode)}
+          size="sm"
+          spacing={0}
+          aria-label="Kartenmodus"
+          className="takeoff-reveal absolute top-2 right-2 z-[1100] bg-background/75 p-0.5 ring-1 ring-foreground/10 backdrop-blur-sm [--reveal-delay:1400ms]"
+        >
+          {MAP_MODES.map(({ value, label }) => (
+            <ToggleGroupItem key={value} value={value} className="rounded-md! px-2 text-xs">
+              {label}
+            </ToggleGroupItem>
+          ))}
+        </ToggleGroup>
       </div>
 
       <div className="takeoff-reveal flex flex-col gap-4 [--reveal-delay:1400ms]">
