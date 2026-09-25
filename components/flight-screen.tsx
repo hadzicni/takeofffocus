@@ -2,12 +2,15 @@
 
 import { useEffect, useState } from "react"
 import dynamic from "next/dynamic"
-import { PauseIcon, PlayIcon, XIcon } from "lucide-react"
+import { PauseIcon, PlayIcon, Volume2Icon, VolumeXIcon, XIcon } from "lucide-react"
 
 import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Progress } from "@/components/ui/progress"
+import { Slider } from "@/components/ui/slider"
+import { Toggle } from "@/components/ui/toggle"
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group"
+import { useCabinNoise } from "@/hooks/use-cabin-noise"
 import { flightPhase } from "@/lib/flight"
 import { elapsedMs, useFlightStore } from "@/lib/flight-store"
 import { announceLanding } from "@/lib/notifications"
@@ -34,10 +37,14 @@ function formatRemaining(ms: number) {
 
 export function FlightScreen({ ticket }: { ticket: Ticket }) {
   const { phase, departedAt, pausedAt, pausedMs, pause, resume, land, abort } = useFlightStore()
-  const { mapMode, setMapMode } = usePreferencesStore()
+  const { mapMode, setMapMode, ambientVolume, setAmbientVolume } = usePreferencesStore()
   const [now, setNow] = useState(Date.now)
+  const [soundOn, setSoundOn] = useState(false)
   const paused = pausedAt !== null
   const landed = phase === "landed"
+
+  // The cabin falls quiet while paused and after landing.
+  useCabinNoise(soundOn && !paused && !landed, ambientVolume)
 
   useEffect(() => {
     if (paused || landed) return
@@ -134,6 +141,30 @@ export function FlightScreen({ ticket }: { ticket: Ticket }) {
             {paused ? <PlayIcon /> : <PauseIcon />}
             {paused ? "Fortsetzen" : "Pause"}
           </Button>
+          <div className="flex h-9 items-center gap-3">
+            <Toggle
+              pressed={soundOn}
+              onPressedChange={setSoundOn}
+              aria-label="Kabinengeräusch"
+              className="shrink-0"
+            >
+              {soundOn ? <Volume2Icon /> : <VolumeXIcon />}
+            </Toggle>
+            {soundOn ? (
+              <Slider
+                value={ambientVolume * 100}
+                onValueChange={(value) =>
+                  setAmbientVolume((Array.isArray(value) ? value[0] : value) / 100)
+                }
+                min={5}
+                max={100}
+                aria-label="Lautstärke Kabinengeräusch"
+                className="flex-1"
+              />
+            ) : (
+              <span className="text-sm text-muted-foreground">Kabinengeräusch</span>
+            )}
+          </div>
           <Button variant="ghost" onClick={abort}>
             <XIcon />
             Flug abbrechen
